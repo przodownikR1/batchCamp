@@ -1,3 +1,5 @@
+import java.lang.invoke.LambdaForm.Compiled;
+
 buildscript {
     ext {
         springBootVersion = '1.2.3.RELEASE'
@@ -10,10 +12,8 @@ buildscript {
         classpath("io.spring.gradle:dependency-management-plugin:0.5.0.RELEASE")
     }
 }
-
 apply plugin: 'java'
 apply plugin: 'eclipse'
-apply plugin: 'idea'
 apply plugin: 'spring-boot' 
 apply plugin: 'io.spring.dependency-management' 
 
@@ -21,8 +21,8 @@ jar {
     baseName = 'springBootCamp'
     version = '0.0.1-SNAPSHOT'
 }
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -37,7 +37,11 @@ dependencies {
     compile("org.projectlombok:lombok:1.16.2")
     compile("org.springframework.boot:spring-boot-starter-jdbc")
     compile("org.springframework.boot:spring-boot-starter-web")
+    compile('org.apache.activemq:activemq-broker:5.11.1')
+    compile('org.apache.activemq:activemq-pool:5.11.1')
+    compile('org.springframework:spring-jms:4.1.6.RELEASE')
     runtime("com.h2database:h2")
+     
     runtime("mysql:mysql-connector-java")
     testCompile("org.springframework.boot:spring-boot-starter-test") 
 }
