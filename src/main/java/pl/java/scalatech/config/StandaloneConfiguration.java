@@ -13,7 +13,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration
 @EnableBatchProcessing
 public class StandaloneConfiguration {
-
+    private static final int MAX_THREADS = 8;
+    private static final int MIN_THREADS = 4;
     @Bean
     public DataSource dataSource() {
         EmbeddedDatabaseBuilder embeddedDatabaseBuilder = new EmbeddedDatabaseBuilder();
@@ -22,5 +23,15 @@ public class StandaloneConfiguration {
                 .build();
     }
 
-   
+    
+
+    @Bean
+    public TaskExecutor taskExecutor() {
+        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+        taskExecutor.setMaxPoolSize(MAX_THREADS);
+        taskExecutor.setCorePoolSize(MIN_THREADS);
+        taskExecutor.afterPropertiesSet();
+        return taskExecutor;
+    }
+
 }
