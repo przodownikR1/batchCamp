@@ -13,7 +13,6 @@ buildscript {
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
-apply plugin: 'idea'
 apply plugin: 'spring-boot' 
 apply plugin: 'io.spring.dependency-management' 
 
@@ -27,7 +26,11 @@ targetCompatibility = 1.7
 repositories {
     mavenCentral()
 }
-
+ext{
+    hikariCPVersion ="2.2.5"
+    codahale="3.0.2"
+    jpaPluginVersion = "1.1.9"
+}
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-actuator")
@@ -37,6 +40,15 @@ dependencies {
     compile("org.projectlombok:lombok:1.16.2")
     compile("org.springframework.boot:spring-boot-starter-jdbc")
     compile("org.springframework.boot:spring-boot-starter-web")
+    compile("com.google.guava:guava:18.0")
+    
+    compile("com.codahale.metrics:metrics-core:${codahale}")
+    compile("com.codahale.metrics:metrics-jvm:${codahale}")
+    compile("com.codahale.metrics:metrics-logback:${codahale}")
+    compile("com.ryantenney.metrics:metrics-spring:3.0.1")
+    
+    compile "com.zaxxer:HikariCP:${hikariCPVersion}"
+    compile("pl.java.scalatech:jpaPlugin:${jpaPluginVersion}")
     runtime("com.h2database:h2")
     runtime("mysql:mysql-connector-java")
     testCompile("org.springframework.boot:spring-boot-starter-test") 
