@@ -18,26 +18,15 @@
         http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
         
         
-    <context:property-placeholder location="classpath:batch.properties" system-properties-mode="OVERRIDE" ignore-unresolvable="false" />    
-    
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" lazy-init="true">
         <property name="dataSource" ref="dataSource" />
     </bean>
-    
-    <bean id="dataSource" class="">
-        <property name="driverClassName" value="${batch.jdbc.driver}" />
-        <property name="url" value="${batch.jdbc.url}" />
-        <property name="username" value="${batch.jdbc.user}" />
-        <property name="password" value="${batch.jdbc.password}" />
-    </bean>
-    
-    <jdbc:initialize-database data-source="dataSource">
-        <jdbc:script location="${batch.schema.script.drop}" />
-        <jdbc:script location="${batch.schema.script}" />
-        <jdbc:script location="classpath:postnr.sql" />
-    </jdbc:initialize-database>
+  
 
     <alias name="transactionManager" alias="transactionBatchManager" />
+    
+    
+    <!-- <bean id="jobRepo"  class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"/> -->
     
     <batch:job-repository id="jobRepository" data-source="dataSource" transaction-manager="transactionBatchManager" isolation-level-for-create="DEFAULT" table-prefix="BATCH_" />
 
@@ -49,8 +38,38 @@
         p:jobLauncher-ref="jobLauncher" p:jobExplorer-ref="jobExplorer" p:jobRepository-ref="jobRepository" p:jobRegistry-ref="jobRegistry" />
         
     <bean id="jobExplorer" class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean" p:dataSource-ref="dataSource" />
-    <bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
+     <bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
+      
+    <beans profile="dev">   
+         <context:property-placeholder location="classpath:batch_mysql.properties" system-properties-mode="OVERRIDE" ignore-unresolvable="false" />   
+           
+    <bean id="dataSource" primary="true" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${batch.jdbc.driver}" />
+        <property name="url" value="${batch.jdbc.url}" />
+        <property name="username" value="${batch.jdbc.user}" />
+        <property name="password" value="${batch.jdbc.password}" />
+    </bean>
+    </beans>
     
-    <bean class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor" p:jobRegistry-ref="jobRegistry" />
+    <beans profile="dev-prepare-db" >
+        <jdbc:initialize-database data-source="dataSource">
+          <jdbc:script location="${batch.schema.script.drop}" />
+          <jdbc:script location="${batch.schema.script}" />
+        </jdbc:initialize-database>  
+    </beans>
+    
+    <beans profile="test">   
+         <context:property-placeholder location="classpath:batch.properties" system-properties-mode="OVERRIDE" ignore-unresolvable="false" />
+          <jdbc:embedded-database id="dataSource" type="H2">
+          <jdbc:script location="${batch.schema.script.drop}" />
+          <jdbc:script location="${batch.schema.script}" />
+           </jdbc:embedded-database>   
+    </beans>
+    
+  <!--  <bean id="jobRegistry" class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean" 
+   
+   p:dataSource-ref="dataSource" p:databaseType="mysql" p:transactionManager-ref="transactionManager" p:tablePrefix="BATCH_"/> -->
+    
+    <!-- <bean class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor" p:jobRegistry-ref="jobRegistry" /> -->
 
 </beans>
