@@ -1,6 +1,7 @@
 package pl.java.scalatech;
 
-import java.time.LocalDate;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Date;
 import java.util.Map;
 
@@ -8,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
@@ -20,9 +22,9 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.google.common.collect.Maps;
-
 import pl.java.scalatech.config.batch.BatchConfig;
+
+import com.google.common.collect.Maps;
 
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -45,6 +47,7 @@ public class FirstTaskletLaunchTest {
             params.put("time", new JobParameter(new Date()));
             JobExecution execution = jobLauncher.run(job, new JobParameters(params));
             log.info("Exit Status :  {}", execution.getStatus());
+            assertEquals(ExitStatus.COMPLETED, execution.getExitStatus());
         } catch (Exception e) {
             e.printStackTrace();
         }
