@@ -7,13 +7,16 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import pl.java.scalatech.config.scheduler.SchedulerConfig;
+
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = BatchCampApplication.class)
+@SpringApplicationConfiguration(classes = {BatchCampApplication.class,SchedulerConfig.class})
 @WebAppConfiguration
 @ActiveProfiles("dev")
 public class BatchCampApplicationTests {
 	@Test
-	public void shouldBootstapContext() {
+	public void shouldBootstapContext() throws InterruptedException {
+	    Thread.sleep(5000);
 	}
 
 }

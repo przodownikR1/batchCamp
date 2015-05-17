@@ -110,7 +110,7 @@ public class BatchConfig {
         return new ResourcelessTransactionManager();
     }
 
-    @Bean
+  /*  @Bean
     @Primary
     public DataSource dataSource() {
         System.err.println(driverDB);
@@ -121,7 +121,7 @@ public class BatchConfig {
         ds.setUsername(userDB);
         ds.setPassword(passwdDB);
         return ds;
-    }
+    }*/
 
     @Bean
     @DependsOn("jobExplorer")
