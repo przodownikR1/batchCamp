@@ -14,8 +14,11 @@
         http://www.springframework.org/schema/jdbc  http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
         http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
 
-   <import resource="classpath:batchConfig.xml"/>
-	<bean id="simpleTask" class="pl.java.scalatech.tasklet.HelloTasklet" />
+     <import resource="classpath:batchConfig.xml"/>
+	 <bean id="simpleTask" class="pl.java.scalatech.tasklet.HelloTasklet" />
+      <!-- sync -->   
+     <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher" 
+      p:jobRepository-ref="jobRepository" />
 
      <jdbc:initialize-database data-source="dataSource">
           <jdbc:script location="classpath:populate.sql" />

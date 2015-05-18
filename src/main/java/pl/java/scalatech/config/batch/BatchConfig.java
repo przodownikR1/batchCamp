@@ -5,7 +5,6 @@ import javax.sql.DataSource;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.JobRegistry;
@@ -13,12 +12,8 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.support.MapJobRegistry;
-import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
-import org.springframework.batch.core.launch.support.SimpleJobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -28,9 +23,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -43,6 +39,7 @@ import pl.java.scalatech.tasklet.HelloTasklet;
 @Configuration
 @EnableBatchProcessing
 @EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class })
+@ComponentScan
 @PropertySource("classpath:batch_mysql.properties")
 @Slf4j
 public class BatchConfig {
@@ -112,8 +109,9 @@ public class BatchConfig {
 
     @Bean
     @Primary
+    @Profile("dev")
     public DataSource dataSource() {
-        System.err.println(driverDB);
+        log.info("+++ primary DataSource -> Batch config <- {} : {}",driverDB,urlDB);
         DriverManagerDataSource ds = new DriverManagerDataSource();
         ds.setDriverClassName(driverDB);
 
@@ -123,7 +121,7 @@ public class BatchConfig {
         return ds;
     }
 
-    @Bean
+   /* @Bean
     @DependsOn("jobExplorer")
     public JobOperator jobOperator(JobLauncher jobLauncher, JobRepository jobRepository, JobExplorer jobExplorer, JobRegistry jobRegistry) throws Exception {
         SimpleJobOperator jobOperator = new SimpleJobOperator();
@@ -135,7 +133,7 @@ public class BatchConfig {
         jobOperator.afterPropertiesSet();
         return jobOperator;
     }
-
+*/
     @Bean
     public JobRegistry jobRegistry() {
         return new MapJobRegistry();
@@ -150,7 +148,7 @@ public class BatchConfig {
         fb.setTablePrefix("BATCH_");
         return fb.getObject();
     }
-
+/*
     @Bean
     @DependsOn("dataSource")
     public JobExplorer jobExplorer(DataSource dataSource) throws Exception {
@@ -159,7 +157,7 @@ public class BatchConfig {
         factory.afterPropertiesSet();
         return factory.getObject();
     }
-
+*/
     @Bean
     public JobLauncher jobLauncher(JobRepository jobRepository) {
         SimpleJobLauncher launcher = new SimpleJobLauncher();
