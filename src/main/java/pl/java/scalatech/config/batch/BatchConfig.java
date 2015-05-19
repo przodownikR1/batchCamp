@@ -20,14 +20,13 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
@@ -38,9 +37,8 @@ import pl.java.scalatech.tasklet.HelloTasklet;
 
 @Configuration
 @EnableBatchProcessing
-@EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class })
+// @EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class })
 @ComponentScan
-@PropertySource("classpath:batch_mysql.properties")
 @Slf4j
 public class BatchConfig {
     @Value("${batch.jdbc.driver}")
@@ -61,9 +59,6 @@ public class BatchConfig {
 
     @Autowired
     private StepBuilderFactory stepBuilders;
-
-    @Autowired
-    private DataSource dataSource;
 
     @Bean
     public ResourceDatabasePopulator resourceDatabasePopulator() {
@@ -109,31 +104,42 @@ public class BatchConfig {
 
     @Bean
     @Primary
-    @Profile("dev")
     public DataSource dataSource() {
-        log.info("+++ primary DataSource -> Batch config <- {} : {}",driverDB,urlDB);
+        log.info("+++ primary DataSource -> Batch config <- {} : {}", driverDB, urlDB);
         DriverManagerDataSource ds = new DriverManagerDataSource();
         ds.setDriverClassName(driverDB);
-
         ds.setUrl(urlDB);
         ds.setUsername(userDB);
         ds.setPassword(passwdDB);
         return ds;
     }
 
-   /* @Bean
-    @DependsOn("jobExplorer")
-    public JobOperator jobOperator(JobLauncher jobLauncher, JobRepository jobRepository, JobExplorer jobExplorer, JobRegistry jobRegistry) throws Exception {
-        SimpleJobOperator jobOperator = new SimpleJobOperator();
-        jobOperator.setJobLauncher(jobLauncher);
-        jobOperator.setJobRepository(jobRepository);
-        jobOperator.setJobExplorer(jobExplorer);
-        jobOperator.setJobRegistry(jobRegistry);
+    @Configuration
+    @PropertySource("classpath:batch_mysql.properties")
+    @Slf4j
+    @Profile("dev")
+    public static class PropertiesLoaderForMysql {
 
-        jobOperator.afterPropertiesSet();
-        return jobOperator;
+        @Bean
+        public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+            log.info("+++               propertySource Mysql -> prop profile launch");
+            return new PropertySourcesPlaceholderConfigurer();
+        }
     }
-*/
+
+    @Configuration
+    @PropertySource("classpath:batch_h2.properties")
+    @Slf4j
+    @Profile("test")
+    public static class PropertiesLoaderForH2 {
+
+        @Bean
+        public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+            log.info("+++         propertySource H2-> prop profile launch");
+            return new PropertySourcesPlaceholderConfigurer();
+        }
+    }
+
     @Bean
     public JobRegistry jobRegistry() {
         return new MapJobRegistry();
@@ -148,16 +154,7 @@ public class BatchConfig {
         fb.setTablePrefix("BATCH_");
         return fb.getObject();
     }
-/*
-    @Bean
-    @DependsOn("dataSource")
-    public JobExplorer jobExplorer(DataSource dataSource) throws Exception {
-        JobExplorerFactoryBean factory = new JobExplorerFactoryBean();
-        factory.setDataSource(dataSource);
-        factory.afterPropertiesSet();
-        return factory.getObject();
-    }
-*/
+
     @Bean
     public JobLauncher jobLauncher(JobRepository jobRepository) {
         SimpleJobLauncher launcher = new SimpleJobLauncher();
@@ -166,7 +163,29 @@ public class BatchConfig {
     }
 
 }
-
+/*
+ * @Bean
+ * @DependsOn("dataSource")
+ * public JobExplorer jobExplorer(DataSource dataSource) throws Exception {
+ * JobExplorerFactoryBean factory = new JobExplorerFactoryBean();
+ * factory.setDataSource(dataSource);
+ * factory.afterPropertiesSet();
+ * return factory.getObject();
+ * }
+ */
+/*
+ * @Bean
+ * @DependsOn("jobExplorer")
+ * public JobOperator jobOperator(JobLauncher jobLauncher, JobRepository jobRepository, JobExplorer jobExplorer, JobRegistry jobRegistry) throws Exception {
+ * SimpleJobOperator jobOperator = new SimpleJobOperator();
+ * jobOperator.setJobLauncher(jobLauncher);
+ * jobOperator.setJobRepository(jobRepository);
+ * jobOperator.setJobExplorer(jobExplorer);
+ * jobOperator.setJobRegistry(jobRegistry);
+ * jobOperator.afterPropertiesSet();
+ * return jobOperator;
+ * }
+ */
 /*
  * @Bean
  * public JobRepository jobRepository(PlatformTransactionManager transactionManager) throws Exception {

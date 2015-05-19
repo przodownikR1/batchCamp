@@ -2,8 +2,10 @@ package pl.java.scalatech.config.job;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
@@ -31,7 +33,7 @@ public class SimpleStringJob {
         return new SimpleStringProcessor();
     }
     @Bean
-    public Job importUserJob(JobBuilderFactory jobs, Step step) {
+    public Job simpleJob(JobBuilderFactory jobs, Step step) {
         return jobs.get("simpleStringProcessing")
                 .incrementer(new RunIdIncrementer())
                 .flow(step)
@@ -42,11 +44,18 @@ public class SimpleStringJob {
     @Bean
     public Step step1(StepBuilderFactory stepBuilderFactory, ItemReader<String> reader,
             ItemWriter<String> writer, ItemProcessor<String, String> processor) {
-        return stepBuilderFactory.get("stepStep")
+        return stepBuilderFactory.get("step1")
                 .<String,String> chunk(3)
                 .reader(reader)
                 .processor(processor)
                 .writer(writer)
                 .build();
+    }
+    
+    @Bean
+    public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(JobRegistry jobRegistry) {
+        JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = new JobRegistryBeanPostProcessor();
+        jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry);
+        return jobRegistryBeanPostProcessor;
     }
 }

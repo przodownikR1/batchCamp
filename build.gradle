@@ -52,6 +52,8 @@ dependencies {
     
     runtime("com.h2database:h2")
     runtime('mysql:mysql-connector-java:5.1.35')
+    testCompile('junit:junit:4.12')
+    testCompile('org.easytesting:fest-assert:1.4')
     testCompile("org.springframework.boot:spring-boot-starter-test") 
 }
 
