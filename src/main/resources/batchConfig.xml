@@ -42,7 +42,7 @@
      <bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
       
     <beans profile="dev">   
-         <context:property-placeholder location="classpath:batch_mysql.properties" system-properties-mode="OVERRIDE" ignore-unresolvable="false" />   
+         <context:property-placeholder location="classpath:batch-dev.properties" system-properties-mode="OVERRIDE" ignore-unresolvable="false" />   
            
     <bean id="dataSource" primary="true" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="${batch.jdbc.driver}" />

@@ -1,5 +1,6 @@
 package pl.java.scalatech;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
@@ -7,6 +8,8 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.fest.assertions.Assertions;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.ExitStatus;
@@ -16,13 +19,16 @@ import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.core.io.Resource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import pl.java.scalatech.config.batch.BatchConfig;
+import pl.java.scalatech.config.batch.firstTasklet.FirstTaskletConfig;
 
 import com.google.common.collect.Maps;
 
@@ -30,13 +36,26 @@ import com.google.common.collect.Maps;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("dev")
 @EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
-@SpringApplicationConfiguration(classes = {BatchCampApplication.class,BatchConfig.class})
+@SpringApplicationConfiguration(classes = {FirstTaskletConfig.class,BatchConfig.class})
 public class FirstTaskletLaunchTest {
 
     @Autowired
     private JobLauncher jobLauncher;
     @Autowired
     private Job job;
+    
+    
+    @Value("classpath:org/springframework/batch/core/schema-mysql.sql")
+    private Resource schemaScript;
+
+    @Value("classpath:org/springframework/batch/core/schema-drop-mysql.sql")
+    private Resource dropScript;
+    
+    @Test
+    public void shouldScriptLoad() {
+        assertThat(schemaScript.exists()).isTrue();
+        assertThat(dropScript.exists()).isTrue();
+    }
 
     @Test
     public void shouldTaskletPrintSomething() {

@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
@@ -53,19 +54,15 @@ public class BatchConfig {
     private String dropScript;
     @Value("${batch.schema.script}")
     private String createScript;
-
-    @Autowired
-    private JobBuilderFactory jobs;
-
-    @Autowired
-    private StepBuilderFactory stepBuilders;
-
+    
     @Bean
     public ResourceDatabasePopulator resourceDatabasePopulator() {
         ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
         resourceDatabasePopulator.addScript(new ClassPathResource(dropScript));
         resourceDatabasePopulator.addScript(new ClassPathResource(createScript));
-        log.info("+++ resourceDbPopulator .... {},{}", dropScript, createScript);
+        log.info("+++ resourceDbPopulator drop.... {}", dropScript);
+        log.info("+++ resourceDbPopulator init.... {}", createScript);
+        
         return resourceDatabasePopulator;
     }
 
@@ -82,24 +79,10 @@ public class BatchConfig {
         log.info("+++ init - > driverDb {}", driverDB);
     }
 
-    @Bean
-    public Job job() {
-        return jobs.get("HelloJob").start(step()).build();
-    }
-
-    @Bean
-    public Step step() {
-        return stepBuilders.get("step").tasklet(helloTasklet()).build();
-    }
-
-    @Bean
-    public Tasklet helloTasklet() {
-        return new HelloTasklet();
-    }
 
     @Bean
     public PlatformTransactionManager transactionManager() {
-        return new ResourcelessTransactionManager();
+        return new DataSourceTransactionManager(dataSource());
     }
 
     @Bean
@@ -115,7 +98,7 @@ public class BatchConfig {
     }
 
     @Configuration
-    @PropertySource("classpath:batch_mysql.properties")
+    @PropertySource("classpath:batch-dev.properties")
     @Slf4j
     @Profile("dev")
     public static class PropertiesLoaderForMysql {
@@ -128,7 +111,7 @@ public class BatchConfig {
     }
 
     @Configuration
-    @PropertySource("classpath:batch_h2.properties")
+    @PropertySource("classpath:batch-test.properties")
     @Slf4j
     @Profile("test")
     public static class PropertiesLoaderForH2 {
