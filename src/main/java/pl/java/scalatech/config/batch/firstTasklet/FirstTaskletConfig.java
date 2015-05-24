@@ -1,9 +1,12 @@
 package pl.java.scalatech.config.batch.firstTasklet;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +19,12 @@ import pl.java.scalatech.config.batch.BatchConfig;
 import pl.java.scalatech.tasklet.HelloTasklet;
 @Configuration
 @Import(BatchConfig.class)
+@Slf4j
 public class FirstTaskletConfig {
     @Autowired
     private JobBuilderFactory jobs;
+    @Autowired
+    private JobLauncher jobLauncher;
 
     @Autowired
     private StepBuilderFactory stepBuilders;

@@ -1,8 +1,7 @@
 package pl.java.scalatech.domain;
 
 import java.math.BigDecimal;
-// fistName,surname,age,salary,city,email,birthdate,login
-import java.time.LocalDate;
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,6 +11,7 @@ import javax.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+// fistName,surname,age,salary,city,email,birthdate,login
 
 @AllArgsConstructor
 @Data
@@ -26,6 +26,6 @@ public class Customer {
     private BigDecimal salary;
     private String city;
     private String email;
-    private LocalDate birthDate;
-    private String login;
+    private Date birthdate;
+    private String description;
 }

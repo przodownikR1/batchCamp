@@ -5,41 +5,37 @@ import javax.sql.DataSource;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor;
 import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
-import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import pl.java.scalatech.tasklet.HelloTasklet;
+import pl.java.scalatech.config.jpa.JpaConfig;
 
 @Configuration
 @EnableBatchProcessing
+@Import(JpaConfig.class)
 // @EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class })
-@ComponentScan
 @Slf4j
 public class BatchConfig {
     @Value("${batch.jdbc.driver}")
@@ -60,8 +56,8 @@ public class BatchConfig {
         ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
         resourceDatabasePopulator.addScript(new ClassPathResource(dropScript));
         resourceDatabasePopulator.addScript(new ClassPathResource(createScript));
-        log.info("+++ resourceDbPopulator drop.... {}", dropScript);
-        log.info("+++ resourceDbPopulator init.... {}", createScript);
+        log.debug("+++ resourceDbPopulator drop.... {}", dropScript);
+        log.debug("+++ resourceDbPopulator init.... {}", createScript);
         
         return resourceDatabasePopulator;
     }
@@ -76,7 +72,7 @@ public class BatchConfig {
 
     @PostConstruct
     public void init() {
-        log.info("+++ init - > driverDb {}", driverDB);
+        log.debug("+++ init - > driverDb {}", driverDB);
     }
 
 
@@ -88,7 +84,7 @@ public class BatchConfig {
     @Bean
     @Primary
     public DataSource dataSource() {
-        log.info("+++ primary DataSource -> Batch config <- {} : {}", driverDB, urlDB);
+        log.debug("+++ primary DataSource -> Batch config <- {} : {}", driverDB, urlDB);
         DriverManagerDataSource ds = new DriverManagerDataSource();
         ds.setDriverClassName(driverDB);
         ds.setUrl(urlDB);
@@ -105,7 +101,7 @@ public class BatchConfig {
 
         @Bean
         public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-            log.info("+++               propertySource Mysql -> prop profile launch");
+            log.debug("+++               propertySource Mysql -> prop profile launch");
             return new PropertySourcesPlaceholderConfigurer();
         }
     }
@@ -118,7 +114,7 @@ public class BatchConfig {
 
         @Bean
         public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-            log.info("+++         propertySource H2-> prop profile launch");
+            log.debug("+++         propertySource H2-> prop profile launch");
             return new PropertySourcesPlaceholderConfigurer();
         }
     }
@@ -131,7 +127,7 @@ public class BatchConfig {
     @Bean
     public JobRepository jobRepository(PlatformTransactionManager transactionManager, DataSource dataSource) throws Exception {
         JobRepositoryFactoryBean fb = new JobRepositoryFactoryBean();
-        log.info("+++  {}", dataSource.getConnection().getMetaData().getDriverName());
+        log.info("+++  jobRepository Store :  {}", dataSource.getConnection().getMetaData().getDriverName());
         fb.setDataSource(dataSource);
         fb.setTransactionManager(transactionManager);
         fb.setTablePrefix("BATCH_");
@@ -144,7 +140,12 @@ public class BatchConfig {
         launcher.setJobRepository(jobRepository);
         return launcher;
     }
-
+    @Bean //beanPostProcessor that registers Job beans with a JobRegistry.
+    public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(JobRegistry jobRegistry) {
+        JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = new JobRegistryBeanPostProcessor();
+        jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry);
+        return jobRegistryBeanPostProcessor;
+    }
 }
 /*
  * @Bean

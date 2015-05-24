@@ -25,7 +25,7 @@ import pl.java.scalatech.config.job.SimpleStringJob;
 
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
-@ActiveProfiles("test")
+@ActiveProfiles("dev")
 @ContextConfiguration(classes = { BatchConfig.class, SimpleStringJob.class })
 public class SimpleStringJobTest {
 
@@ -34,7 +34,7 @@ public class SimpleStringJobTest {
 
     @Autowired
     private JobLauncher jobLauncher;
-
+    
     @Test
     public void shouldSimpleJobTest() throws NoSuchJobException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException,
             JobParametersInvalidException {
