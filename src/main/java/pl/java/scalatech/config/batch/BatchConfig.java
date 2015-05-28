@@ -37,6 +37,7 @@ import pl.java.scalatech.config.jpa.JpaConfig;
 @Import(JpaConfig.class)
 // @EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class })
 @Slf4j
+@ComponentScan(basePackages="pl.java.scalatech.listeners")
 public class BatchConfig {
     @Value("${batch.jdbc.driver}")
     private String driverDB;

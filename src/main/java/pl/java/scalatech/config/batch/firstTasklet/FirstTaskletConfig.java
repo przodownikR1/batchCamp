@@ -3,6 +3,7 @@ package pl.java.scalatech.config.batch.firstTasklet;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import pl.java.scalatech.config.batch.BatchConfig;
+import pl.java.scalatech.tasklet.FirstTasklet;
 import pl.java.scalatech.tasklet.HelloTasklet;
 @Configuration
 @Import(BatchConfig.class)
@@ -25,22 +27,31 @@ public class FirstTaskletConfig {
     private JobBuilderFactory jobs;
     @Autowired
     private JobLauncher jobLauncher;
+    
 
     @Autowired
     private StepBuilderFactory stepBuilders;
     @Bean
-    public Job job() {
-        return jobs.get("HelloJob").start(step()).build();
+    public Job job(JobExecutionListener listener) {
+        return jobs.get("HelloJob").listener(listener).start(step()).next(step1()).build();
     }
 
     @Bean
     public Step step() {
         return stepBuilders.get("step").tasklet(helloTasklet()).build();
     }
+    
+    public Step step1() {
+        return stepBuilders.get("step1").tasklet(firstTasklet()).build();
+    }
 
     @Bean
     public Tasklet helloTasklet() {
         return new HelloTasklet();
+    }
+    @Bean
+    public Tasklet firstTasklet() {
+        return new FirstTasklet();
     }
 
     @Bean

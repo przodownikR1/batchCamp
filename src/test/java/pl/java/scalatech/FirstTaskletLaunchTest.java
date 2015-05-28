@@ -63,6 +63,7 @@ public class FirstTaskletLaunchTest {
         try {
             Map<String,JobParameter> params = Maps.newHashMap();
             params.put("test", new JobParameter("przodownik"));
+            params.put("name", new JobParameter("borowiec"));
             params.put("time", new JobParameter(new Date()));
             JobExecution execution = jobLauncher.run(job, new JobParameters(params));
             log.info("Exit Status :  {}", execution.getStatus());
