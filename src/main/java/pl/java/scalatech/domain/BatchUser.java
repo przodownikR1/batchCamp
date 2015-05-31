@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class BatchUser {
+public class BatchUser implements Domain{
     @Id @GeneratedValue(strategy=GenerationType.AUTO) 
     private Long id;
     private String login;

@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Entity
-public class Customer {
+public class Customer implements Domain{
     @Id @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
     private String firstName;
