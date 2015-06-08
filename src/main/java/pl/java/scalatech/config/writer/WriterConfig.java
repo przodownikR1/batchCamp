@@ -9,10 +9,9 @@ import pl.java.scalatech.domain.Domain;
 @Configuration
 public class WriterConfig<T extends Domain> {
 
-    
     @Bean
     public ItemWriter<T> genericWriter() {
-        return ;
-    
+        return null;
+
     }
 }
