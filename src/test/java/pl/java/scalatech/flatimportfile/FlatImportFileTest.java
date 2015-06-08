@@ -1,5 +1,7 @@
 package pl.java.scalatech.flatimportfile;
 
+import java.io.IOException;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.fest.assertions.Assertions;
@@ -24,31 +26,36 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import pl.java.scalatech.config.batch.BatchConfig;
 import pl.java.scalatech.config.job.FlatFileJob;
+import pl.java.scalatech.config.metrics.JmxConfig;
 
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("dev")
-@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
-@SpringApplicationConfiguration(classes = {BatchConfig.class,FlatFileJob.class})
+@EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class })
+@SpringApplicationConfiguration(classes = { BatchConfig.class, FlatFileJob.class, JmxConfig.class })
 public class FlatImportFileTest {
     @Autowired
     private JobRegistry jobRegistry;
 
     @Autowired
     private JobLauncher jobLauncher;
+
     @Test
     public void shouldBootStrapWork() {
-        
+
     }
+
     @Test
-    public void shouldCsvProcessing() throws NoSuchJobException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException {
-            Job job = jobRegistry.getJob("importCustomers");
-            Assertions.assertThat(jobRegistry).isNotNull();
-            Assertions.assertThat(jobLauncher).isNotNull();
-            log.info("jobs :  {}", jobRegistry.getJobNames());
-            //
-            Assertions.assertThat(job).isNotNull();
-            Assertions.assertThat(jobLauncher.run(job, new JobParameters()).getExitStatus()).isEqualTo(ExitStatus.COMPLETED);
-        }
-    
+    public void shouldCsvProcessing() throws NoSuchJobException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException,
+            JobParametersInvalidException, IOException {
+        Job job = jobRegistry.getJob("importCustomers");
+        Assertions.assertThat(jobRegistry).isNotNull();
+        Assertions.assertThat(jobLauncher).isNotNull();
+        log.info("jobs :  {}", jobRegistry.getJobNames());
+        //
+        Assertions.assertThat(job).isNotNull();
+        Assertions.assertThat(jobLauncher.run(job, new JobParameters()).getExitStatus()).isEqualTo(ExitStatus.COMPLETED);
+        System.in.read();
+    }
+
 }

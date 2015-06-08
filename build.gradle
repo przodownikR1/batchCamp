@@ -43,7 +43,8 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-jdbc")
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("com.google.guava:guava:18.0")
-    
+     
+    compile ("com.jayway.awaitility:awaitility:1.6.3") 
     compile("com.codahale.metrics:metrics-core:${codahale}")
     compile("com.codahale.metrics:metrics-jvm:${codahale}")
     compile("com.codahale.metrics:metrics-logback:${codahale}")

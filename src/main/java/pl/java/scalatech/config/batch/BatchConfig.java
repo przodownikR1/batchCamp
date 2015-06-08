@@ -23,7 +23,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
@@ -37,7 +36,7 @@ import pl.java.scalatech.config.jpa.JpaConfig;
 @Import(JpaConfig.class)
 // @EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class })
 @Slf4j
-@ComponentScan(basePackages="pl.java.scalatech.listeners")
+@ComponentScan(basePackages = "pl.java.scalatech.listeners")
 public class BatchConfig {
     @Value("${batch.jdbc.driver}")
     private String driverDB;
@@ -51,7 +50,7 @@ public class BatchConfig {
     private String dropScript;
     @Value("${batch.schema.script}")
     private String createScript;
-    
+
     @Bean
     public ResourceDatabasePopulator resourceDatabasePopulator() {
         ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
@@ -59,7 +58,7 @@ public class BatchConfig {
         resourceDatabasePopulator.addScript(new ClassPathResource(createScript));
         log.debug("+++ resourceDbPopulator drop.... {}", dropScript);
         log.debug("+++ resourceDbPopulator init.... {}", createScript);
-        
+
         return resourceDatabasePopulator;
     }
 
@@ -75,7 +74,6 @@ public class BatchConfig {
     public void init() {
         log.debug("+++ init - > driverDb {}", driverDB);
     }
-
 
     @Bean
     public PlatformTransactionManager transactionManager() {
@@ -141,7 +139,9 @@ public class BatchConfig {
         launcher.setJobRepository(jobRepository);
         return launcher;
     }
-    @Bean //beanPostProcessor that registers Job beans with a JobRegistry.
+
+    @Bean
+    // beanPostProcessor that registers Job beans with a JobRegistry.
     public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(JobRegistry jobRegistry) {
         JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = new JobRegistryBeanPostProcessor();
         jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry);
@@ -149,27 +149,7 @@ public class BatchConfig {
     }
 }
 /*
- * @Bean
- * @DependsOn("dataSource")
- * public JobExplorer jobExplorer(DataSource dataSource) throws Exception {
- * JobExplorerFactoryBean factory = new JobExplorerFactoryBean();
- * factory.setDataSource(dataSource);
- * factory.afterPropertiesSet();
- * return factory.getObject();
- * }
- */
-/*
- * @Bean
- * @DependsOn("jobExplorer")
- * public JobOperator jobOperator(JobLauncher jobLauncher, JobRepository jobRepository, JobExplorer jobExplorer, JobRegistry jobRegistry) throws Exception {
- * SimpleJobOperator jobOperator = new SimpleJobOperator();
- * jobOperator.setJobLauncher(jobLauncher);
- * jobOperator.setJobRepository(jobRepository);
- * jobOperator.setJobExplorer(jobExplorer);
- * jobOperator.setJobRegistry(jobRegistry);
- * jobOperator.afterPropertiesSet();
- * return jobOperator;
- * }
+ 
  */
 /*
  * @Bean
