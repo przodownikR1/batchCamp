@@ -180,8 +180,5 @@ public class FlatFileJob {
         return new JdbcTemplate(dataSource);
     }
 
-    public static void main(String[] args) throws ParseException {
-        String date = "08-19-15";
-        System.out.println(sdf.parse(date));
-    }
+   
 }

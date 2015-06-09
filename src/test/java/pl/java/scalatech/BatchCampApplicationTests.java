@@ -10,7 +10,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = BatchCampApplication.class)
 @WebAppConfiguration
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 public class BatchCampApplicationTests {
 	@Test
 	public void shouldBootstapContext() {

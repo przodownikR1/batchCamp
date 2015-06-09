@@ -3,6 +3,7 @@ package pl.java.scalatech.jmx;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -24,6 +25,7 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.StepExecution;
@@ -40,6 +42,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import com.google.common.collect.Maps;
 
 import pl.java.scalatech.config.batch.BatchConfig;
 import pl.java.scalatech.config.job.SimpleStringJob;
@@ -71,14 +75,16 @@ public class JmxTest {
 
     @Test
     public void shouldSimpleJobTest() throws NoSuchJobException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException,
-            JobParametersInvalidException {
+            JobParametersInvalidException, InterruptedException {
         Job job = jobRegistry.getJob("simpleStringProcessing");
         Assertions.assertThat(jobRegistry).isNotNull();
         Assertions.assertThat(jobLauncher).isNotNull();
         log.info("jobs :  {}", jobRegistry.getJobNames());
         //
         Assertions.assertThat(job).isNotNull();
-        Assertions.assertThat(jobLauncher.run(job, new JobParameters()).getExitStatus()).isEqualTo(ExitStatus.COMPLETED);
+        Map<String,JobParameter> params = Maps.newHashMap();
+        params.put("time", new JobParameter(System.currentTimeMillis()));
+        Assertions.assertThat(jobLauncher.run(job, new JobParameters(params)).getExitStatus()).isEqualTo(ExitStatus.COMPLETED);
     }
 
     public void shouldJmxWork() throws IOException, MalformedObjectNameException {
@@ -114,7 +120,8 @@ public class JmxTest {
         int count = jobExplorer.getJobInstanceCount(jobName);
 
         log.info(" jobname : {} , count : {}", jobName, count);
-        long executionId = jobOperator.start(jobName, "" + ai.incrementAndGet());
+        //TODO
+        long executionId = jobOperator.start("simpleStringProcessing", "" + System.currentTimeMillis());
         await().until(finished(executionId));
         JobExecution execution = jobExplorer.getJobExecution(executionId);
         assertEquals(ExitStatus.COMPLETED.getExitCode(), execution.getExitStatus().getExitCode());
