@@ -1,0 +1,80 @@
+package pl.java.scalatech.reader;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Random;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.NonTransientResourceException;
+import org.springframework.batch.item.ParseException;
+import org.springframework.batch.item.UnexpectedInputException;
+
+import pl.java.scalatech.domain.Person;
+import pl.java.scalatech.domain.Profession;
+import pl.java.scalatech.domain.Project;
+import pl.java.scalatech.domain.Technology;
+
+import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hashing;
+
+public class FastGenerateDataReader implements ItemReader<Person> {
+
+    private List<Person> persons = Lists.newArrayList();
+    private List<String> techs = Lists.newArrayList("java", "maven", "gradle", "spring", "hibernate", "rest", "ws", "monitoring", "nosql", "jpa", "groovy",
+            "spring-security", "batch", "boot", "jenkins", "sonar", "eclipse", "idea");
+    private List<String> projectNames = Lists.newArrayList("eb", "arimr", "idea", "touk", "bocian", "koala", "bsp", "igolf", "filmweb", "mm", "gaminator",
+            "trip", "dziennik", "testament", "jpaPlugin", "restPoc", "social warehouse", "ogw", "pn", "payu", "terra");
+    HashFunction hf = Hashing.md5();
+
+    @PostConstruct
+    public void init() {
+        List<Profession> proffessions = Lists.newArrayList(Profession.values());
+        for (int i = 0; i < 1000; i++) {
+            List<Project> projects = Lists.newArrayList();
+            Random r = new Random();
+            createProject(projects, r);
+            persons.add(createPerson(proffessions, i, projects, r));
+
+        }
+    }
+
+    private Person createPerson(List<Profession> proffessions, int i, List<Project> projects, Random r) {
+        String passwd = Hashing.md5().hashString("passwd" + i, Charsets.UTF_8).toString();
+        int prof = r.nextInt(proffessions.size() - 1);
+        if (prof < 0) {
+            prof = 0;
+        }
+        Person p = Person.builder().city("Warsaw").login("login:" + i).passwd(passwd).salary(new BigDecimal(r.nextInt(100000))).projects(projects)
+                .profession(proffessions.get(prof)).build();
+        return p;
+    }
+
+    private void createProject(List<Project> projects, Random r) {
+        List<Technology> techList = Lists.newArrayList();
+
+        for (int t = 0; t < 4; t++) {
+            int tch = r.nextInt(techs.size() - 1);
+            if (tch < 0) {
+                tch = 0;
+            }
+            techList.add(Technology.builder().name(techs.get(tch)).build());
+        }
+        for (int j = 0; j < r.nextInt(5); j++) {
+            int pn = r.nextInt(projectNames.size() - 1);
+            if (pn < 0) {
+                pn = 0;
+            }
+            projects.add(Project.builder().name(projectNames.get(pn)).technologies(techList).description("aaa").build());
+        }
+    }
+
+    @Override
+    public Person read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+        return !persons.isEmpty() ? persons.remove(0) : null;
+    }
+
+}

@@ -12,13 +12,13 @@ import pl.java.scalatech.config.jpa.JpaConfig;
 
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
-@ActiveProfiles("dev")
-@SpringApplicationConfiguration(classes = {JpaConfig.class})
+@ActiveProfiles("test")
+@SpringApplicationConfiguration(classes = { JpaConfig.class })
 public class JpaTest {
 
     @Test
     public void shouldBootstrapWork() {
-        
+
     }
-    
+
 }
