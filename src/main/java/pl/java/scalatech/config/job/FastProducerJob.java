@@ -16,10 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
 
+import pl.java.scalatech.config.jpa.JpaConfig;
 import pl.java.scalatech.domain.Person;
 import pl.java.scalatech.listeners.JobLoggerListener;
 import pl.java.scalatech.reader.FastGenerateDataReader;
@@ -27,6 +29,7 @@ import pl.java.scalatech.repository.PersononRepository;
 
 @Configuration
 @Slf4j
+@Import(JpaConfig.class)
 @ComponentScan(basePackages = "pl.java.scalatech.listeners")
 public class FastProducerJob {
     private static final int THREAD_POOL_SIZE = 5;

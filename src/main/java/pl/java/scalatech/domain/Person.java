@@ -9,7 +9,9 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +23,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "Workers")
 public class Person {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -33,6 +36,7 @@ public class Person {
     private Profession profession;
     private String city;
     @OneToMany
+    @JoinColumn(name = "personId")
     private List<Project> projects;
 
 }
