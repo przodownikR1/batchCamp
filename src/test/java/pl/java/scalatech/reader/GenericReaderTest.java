@@ -1,5 +1,7 @@
 package pl.java.scalatech.reader;
 
+import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.fest.assertions.Assertions;
@@ -7,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.configuration.JobRegistry;
@@ -21,6 +24,8 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import com.google.common.collect.Maps;
 
 import pl.java.scalatech.config.job.SimpleGenericReaderJob;
 
@@ -46,7 +51,9 @@ public class GenericReaderTest {
             Assertions.assertThat(jobLauncher).isNotNull();
             log.info("jobs :  {}", jobRegistry.getJobNames());
             //
+            Map<String,JobParameter> params = Maps.newHashMap();
+            params.put("time", new JobParameter(System.currentTimeMillis()));
             Assertions.assertThat(job).isNotNull();
-            Assertions.assertThat(jobLauncher.run(job, new JobParameters()).getExitStatus()).isEqualTo(ExitStatus.COMPLETED);
+            Assertions.assertThat(jobLauncher.run(job, new JobParameters(params)).getExitStatus()).isEqualTo(ExitStatus.COMPLETED);
         }
 }

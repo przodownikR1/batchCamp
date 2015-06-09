@@ -54,7 +54,7 @@ public class FastJobTest {
         Assertions.assertThat(jobRegistry).isNotNull();
         Assertions.assertThat(jobLauncher).isNotNull();
         log.info("jobs :  {}", jobRegistry.getJobNames());
-        long executionId = jobOperator.start("fastProcessing", "" + System.currentTimeMillis());
+        long executionId = jobOperator.start(jobRegistry.getJobNames().stream().findFirst().get(), "" + System.currentTimeMillis());
         await().until(finished(executionId));
         JobExecution execution = jobExplorer.getJobExecution(executionId);
         assertEquals(ExitStatus.COMPLETED.getExitCode(), execution.getExitStatus().getExitCode());

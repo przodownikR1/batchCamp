@@ -162,7 +162,7 @@ public class FlatFileJob {
 
     @Bean
     public Job importUserJob(Step step1, Step step2) {
-        return jobs.get("importCustomers").incrementer(new RunIdIncrementer()).start(step1).next(step2).build();
+        return jobs.get("importCustomers").start(step1).next(step2).build();
     }
 
     @Bean

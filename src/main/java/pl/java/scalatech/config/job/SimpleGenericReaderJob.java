@@ -54,7 +54,7 @@ public class SimpleGenericReaderJob {
 
     @Bean
     public Job importUserJob(Step step1, Step step2) {
-        return jobs.get("simpleCustomers").incrementer(new RunIdIncrementer()).start(step1).build();
+        return jobs.get("simpleCustomers").start(step1).build();
     }
 
     @Bean
