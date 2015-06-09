@@ -7,12 +7,15 @@ import javax.annotation.PostConstruct;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.fest.assertions.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import pl.java.scalatech.config.jpa.JpaConfig;
 import pl.java.scalatech.domain.Person;
@@ -23,15 +26,19 @@ import pl.java.scalatech.utils.EntitiesFactory;
 
 import com.google.common.collect.Lists;
 
+import static org.fest.assertions.Assertions.assertThat;
+
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("dev")
 @SpringApplicationConfiguration(classes = { JpaConfig.class })
+@Transactional
 public class JpaTest {
-
     private final static List<Person> persons = Lists.newArrayList();
     @Autowired
     private PersonRepository personRepository;
+    @Value("${profile_test}")
+    private String profile;
 
     @PostConstruct
     public void init() {
@@ -46,8 +53,13 @@ public class JpaTest {
     }
 
     @Test
-    public void shouldBootstrapWork() {
-        persons.stream().forEach(p -> personRepository.save(p));
+    public void shouldChooseRightProfile() {
+        assertThat(profile).isEqualTo("dev");
     }
 
+    @Test
+    public void shouldBootstrapWork() {
+        persons.stream().forEach(p -> personRepository.save(p));
+        Assertions.assertThat(personRepository.count()).isEqualTo(10);
+    }
 }

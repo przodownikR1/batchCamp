@@ -1,6 +1,5 @@
 package pl.java.scalatech.config.batch;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import lombok.extern.slf4j.Slf4j;
@@ -13,18 +12,14 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -38,18 +33,14 @@ import pl.java.scalatech.config.jpa.JpaConfig;
 @Slf4j
 @ComponentScan(basePackages = "pl.java.scalatech.listeners")
 public class BatchConfig {
-    @Value("${batch.jdbc.driver}")
-    private String driverDB;
-    @Value("${batch.jdbc.url}")
-    private String urlDB;
-    @Value("${batch.jdbc.user}")
-    private String userDB;
-    @Value("${batch.jdbc.password}")
-    private String passwdDB;
+
     @Value("${batch.schema.script.drop}")
     private String dropScript;
     @Value("${batch.schema.script}")
     private String createScript;
+
+    @Autowired
+    private DataSource dataSource;
 
     @Bean
     public ResourceDatabasePopulator resourceDatabasePopulator() {
@@ -70,52 +61,9 @@ public class BatchConfig {
         return dataSourceInitializer;
     }
 
-    @PostConstruct
-    public void init() {
-        log.debug("+++ init - > driverDb {}", driverDB);
-    }
-
     @Bean
     public PlatformTransactionManager transactionManager() {
-        return new DataSourceTransactionManager(dataSource());
-    }
-
-    @Bean
-    @Primary
-    public DataSource dataSource() {
-        log.debug("+++ primary DataSource -> Batch config <- {} : {}", driverDB, urlDB);
-        DriverManagerDataSource ds = new DriverManagerDataSource();
-        ds.setDriverClassName(driverDB);
-        ds.setUrl(urlDB);
-        ds.setUsername(userDB);
-        ds.setPassword(passwdDB);
-        return ds;
-    }
-
-    @Configuration
-    @PropertySource("classpath:batch-dev.properties")
-    @Slf4j
-    @Profile("dev")
-    public static class PropertiesLoaderForMysql {
-
-        @Bean
-        public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-            log.debug("+++               propertySource Mysql -> prop profile launch");
-            return new PropertySourcesPlaceholderConfigurer();
-        }
-    }
-
-    @Configuration
-    @PropertySource("classpath:batch-test.properties")
-    @Slf4j
-    @Profile("test")
-    public static class PropertiesLoaderForH2 {
-
-        @Bean
-        public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-            log.debug("+++         propertySource H2-> prop profile launch");
-            return new PropertySourcesPlaceholderConfigurer();
-        }
+        return new DataSourceTransactionManager(dataSource);
     }
 
     @Bean
