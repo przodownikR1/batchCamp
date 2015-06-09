@@ -29,7 +29,7 @@ public class Project {
     private Long id;
     private String name;
     private String description;
-    @OneToMany(cascade = CascadeType.MERGE)
+    @OneToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST })
     @JoinColumn(name = "projectId")
     private List<Technology> technologies;
 

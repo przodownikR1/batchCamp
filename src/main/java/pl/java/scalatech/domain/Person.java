@@ -3,6 +3,7 @@ package pl.java.scalatech.domain;
 import java.math.BigDecimal;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -35,7 +36,7 @@ public class Person {
     @Enumerated(EnumType.STRING)
     private Profession profession;
     private String city;
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "personId")
     private List<Project> projects;
 

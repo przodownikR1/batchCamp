@@ -20,6 +20,7 @@
 	<logger name="pl.java.scalatech" level="info" />
 	<logger name="org.springframework" level="info" />
 	<logger name="org.springframework.data" level="warn" />
+	<logger name="org.hibernate" level="info" />
 	<logger name="org.springframework.security" level="info" />
 	<logger name="org.springframework.jms" level="info" />
 	

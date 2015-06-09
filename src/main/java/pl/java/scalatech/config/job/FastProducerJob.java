@@ -25,7 +25,7 @@ import pl.java.scalatech.config.jpa.JpaConfig;
 import pl.java.scalatech.domain.Person;
 import pl.java.scalatech.listeners.JobLoggerListener;
 import pl.java.scalatech.reader.FastGenerateDataReader;
-import pl.java.scalatech.repository.PersononRepository;
+import pl.java.scalatech.repository.PersonRepository;
 
 @Configuration
 @Slf4j
@@ -44,7 +44,7 @@ public class FastProducerJob {
     private StepBuilderFactory steps;
 
     @Autowired
-    private PersononRepository personRepository;
+    private PersonRepository personRepository;
 
     @Bean
     public TaskExecutor taskExecutor() {
