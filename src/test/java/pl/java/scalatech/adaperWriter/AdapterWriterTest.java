@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -21,6 +22,7 @@ import pl.java.scalatech.config.metrics.JmxConfig;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("dev")
 @EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class })
+@DirtiesContext
 @SpringApplicationConfiguration(classes = { BatchConfig.class, AdapterWriterJob.class, JmxConfig.class })
 public class AdapterWriterTest {
     @Autowired
