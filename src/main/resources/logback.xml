@@ -7,6 +7,8 @@
 	<property scope="context" name="pattern_log2" value="%d{yyyy/MM/dd HH:mm:ss,SSS} [%thread] %-5level %logger{36} - %m %throwable{0}%n" />
 	<property scope="context" name="pattern_sql" value="%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread][%logger{0}] %m%n" />
 	<contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+	<timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss"/>
+	
 		<resetJUL>true</resetJUL>
 	</contextListener>
 	
@@ -23,7 +25,7 @@
 	</appender>
 	
 	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>batchCamp.log</file>
+		<file>batchCamp-${bySecond}.log</file>
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>WARN</level>
         </filter>
