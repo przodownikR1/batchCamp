@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.JMX;
@@ -29,47 +28,29 @@ import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobInstanceAlreadyExistsException;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import pl.java.scalatech.common.CommonJobTest;
+import pl.java.scalatech.config.job.SimpleStringJob;
+
 import com.google.common.collect.Maps;
 
-import pl.java.scalatech.config.batch.BatchConfig;
-import pl.java.scalatech.config.job.SimpleStringJob;
-import pl.java.scalatech.config.metrics.JmxConfig;
 import static com.jayway.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("dev")
-@DirtiesContext
-@ContextConfiguration(classes = { BatchConfig.class, SimpleStringJob.class, JmxConfig.class })
-public class JmxTest {
-
-    @Autowired
-    private JobExplorer jobExplorer;
-
-    @Autowired
-    private JobOperator jobOperator;
-
-    @Autowired
-    private JobRegistry jobRegistry;
-
-    @Autowired
-    private JobLauncher jobLauncher;
+@ContextConfiguration(classes = { SimpleStringJob.class })
+public class JmxTest extends CommonJobTest {
 
     private AtomicInteger ai = new AtomicInteger();
 
@@ -84,7 +65,7 @@ public class JmxTest {
         log.info("jobs :  {}", jobRegistry.getJobNames());
         //
         Assertions.assertThat(job).isNotNull();
-        Map<String,JobParameter> params = Maps.newHashMap();
+        Map<String, JobParameter> params = Maps.newHashMap();
         params.put("time", new JobParameter(System.currentTimeMillis()));
         Assertions.assertThat(jobLauncher.run(job, new JobParameters(params)).getExitStatus()).isEqualTo(ExitStatus.COMPLETED);
     }
@@ -122,7 +103,7 @@ public class JmxTest {
         int count = jobExplorer.getJobInstanceCount(jobName);
 
         log.info(" jobname : {} , count : {}", jobName, count);
-        //TODO
+        // TODO
         long executionId = jobOperator.start("simpleStringProcessing", "" + System.currentTimeMillis());
         await().until(finished(executionId));
         JobExecution execution = jobExplorer.getJobExecution(executionId);
@@ -142,10 +123,6 @@ public class JmxTest {
         }
 
         return failureExceptions;
-    }
-
-    private Callable<Boolean> finished(final long executionId) {
-        return () -> jobExplorer.getJobExecution(executionId).isRunning() == false;
     }
 
 }
