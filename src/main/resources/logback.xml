@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 	<property scope="context" name="pattern_stdout"
-		value="%highlight(%.-5level)|%green(%date{yyyy-MM-dd HH:mm:ss.SSS})|%boldMagenta([%thread])|%yellow(%logger{70}:%boldYellow(%line)) - %msg%n%red(%rEx)" />
-	<property scope="context" name="pattern_log" value="%-4relative [%thread] %-5level %logger{35} - %msg %n"/>
+		value="%highlight(%.-5level)|%green(%date{yyyy-MM-dd HH:mm:ss.SSS})|%boldMagenta([%thread])|%yellow(%logger{20}:%boldYellow(%line))  - %msg%red(%ex{short})" />
+		
+		<!-- <property scope="context" name="pattern_stdout"
+        value="%highlight(%.-5level)|%green(%date{yyyy-MM-dd HH:mm:ss.SSS})|%boldMagenta([%thread])|%yellow(%logger{20}:%boldYellow(%line))  - %msg\n%n%caller{1}%red(%rEx)" /> -->
+	<property scope="context" name="pattern_log" value="%-4relative [%thread] %-5level %logger{26} - %msg %n"/>
 	<property scope="context" name="pattern_audit" value="%m %throwable{0}%n" />	
-	<property scope="context" name="pattern_log2" value="%d{yyyy/MM/dd HH:mm:ss,SSS} [%thread] %-5level %logger{36} - %m %throwable{0}%n" />
-	<property scope="context" name="pattern_sql" value="%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread][%logger{0}] %m%n" />
+	<property scope="context" name="pattern_log2" value="%d{yyyy/MM/dd HH:mm:ss,SSS} [%thread] %-5level %logger{30} - %m %throwable{0}%n" />
+	<property scope="context" name="pattern_sql" value="%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread][%logger{30}] %m%n" />
 	<contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
 	<timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss"/>
 	
