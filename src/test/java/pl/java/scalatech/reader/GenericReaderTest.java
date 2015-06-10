@@ -25,35 +25,33 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.google.common.collect.Maps;
-
 import pl.java.scalatech.config.job.SimpleGenericReaderJob;
+
+import com.google.common.collect.Maps;
 
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("dev")
-@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
-@SpringApplicationConfiguration(classes = {SimpleGenericReaderJob.class})
+@EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class })
+@SpringApplicationConfiguration(classes = { SimpleGenericReaderJob.class })
 public class GenericReaderTest {
     @Autowired
     private JobRegistry jobRegistry;
 
     @Autowired
     private JobLauncher jobLauncher;
+
     @Test
-    public void shouldBootStrapWork() {
-        
+    public void shouldCsvProcessing() throws NoSuchJobException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException,
+            JobParametersInvalidException {
+        Job job = jobRegistry.getJob("simpleCustomers");
+        Assertions.assertThat(jobRegistry).isNotNull();
+        Assertions.assertThat(jobLauncher).isNotNull();
+        log.info("jobs :  {}", jobRegistry.getJobNames());
+        //
+        Map<String, JobParameter> params = Maps.newHashMap();
+        params.put("time", new JobParameter(System.currentTimeMillis()));
+        Assertions.assertThat(job).isNotNull();
+        Assertions.assertThat(jobLauncher.run(job, new JobParameters(params)).getExitStatus()).isEqualTo(ExitStatus.COMPLETED);
     }
-    @Test
-    public void shouldCsvProcessing() throws NoSuchJobException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException {
-            Job job = jobRegistry.getJob("simpleCustomers");
-            Assertions.assertThat(jobRegistry).isNotNull();
-            Assertions.assertThat(jobLauncher).isNotNull();
-            log.info("jobs :  {}", jobRegistry.getJobNames());
-            //
-            Map<String,JobParameter> params = Maps.newHashMap();
-            params.put("time", new JobParameter(System.currentTimeMillis()));
-            Assertions.assertThat(job).isNotNull();
-            Assertions.assertThat(jobLauncher.run(job, new JobParameters(params)).getExitStatus()).isEqualTo(ExitStatus.COMPLETED);
-        }
 }

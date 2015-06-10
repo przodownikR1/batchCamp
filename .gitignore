@@ -83,3 +83,4 @@ gc.log
 /file_from_fd_store.png
 /batchCamp.log
 batchCamp.log
+*.log

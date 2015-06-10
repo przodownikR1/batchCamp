@@ -1,30 +1,119 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+	<property scope="context" name="pattern_stdout"
+		value="%highlight(%.-5level)|%green(%date{yyyy-MM-dd HH:mm:ss.SSS})|%boldMagenta([%thread])|%yellow(%logger{70}:%boldYellow(%line)) - %msg%n%red(%rEx)" />
+	<property scope="context" name="pattern_log" value="%-4relative [%thread] %-5level %logger{35} - %msg %n"/>
+	<property scope="context" name="pattern_audit" value="%m %throwable{0}%n" />	
+	<property scope="context" name="pattern_log2" value="%d{yyyy/MM/dd HH:mm:ss,SSS} [%thread] %-5level %logger{36} - %m %throwable{0}%n" />
+	<property scope="context" name="pattern_sql" value="%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread][%logger{0}] %m%n" />
 	<contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
 		<resetJUL>true</resetJUL>
 	</contextListener>
+	
+	<consolePlugin />
 	<jmxConfigurator />
+	<withJansi>false</withJansi>
+	
 	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
-			<pattern>%.-1level|%-40.40logger{0}|%msg%n</pattern>
+			<charset>utf-8</charset>
+			<pattern>${pattern_stdout}</pattern>
+			<pattern></pattern>
 		</encoder>
 	</appender>
-	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
+	
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>batchCamp.log</file>
-		<append>true</append>
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>batchCamp.%d{yyyyMMdd}.log
+            </fileNamePattern>
+        </rollingPolicy>
+		<append>false</append>
 		<encoder>
-			<pattern>%-4relative [%thread] %-5level %logger{35} - %msg %n
-			</pattern>
+            <pattern>${pattern_log}</pattern>
+        </encoder>
+		
+	</appender>
+
+	
+	<appender name="SQL_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+      <file>batchCampSQL.log</file>
+      <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+           <fileNamePattern>batchCampSQL.%i.log.zip</fileNamePattern>
+          <minIndex>1</minIndex>
+          <maxIndex>5</maxIndex>
+        </rollingPolicy>
+      <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+       <maxFileSize>50MB</maxFileSize>
+      </triggeringPolicy>
+     <encoder>
+        <pattern>${pattern_sql}</pattern>
+     </encoder>
+    </appender> 
+	
+	<appender name="AUDIT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>audit.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>batchCampAudit.%d{yyyyMMdd}.log.gzip</fileNamePattern>
+		</rollingPolicy>
+		<encoder>
+			<pattern>${pattern_audit}</pattern>
 		</encoder>
 	</appender>
+	
+	<appender name="PROBLEM_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>troubleshooting.log</file>
+		<append>false</append>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>batchCampTroubleshooting.%i.log</fileNamePattern>
+			<maxIndex>10</maxIndex>
+		</rollingPolicy>
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<maxFileSize>2MB</maxFileSize>
+		</triggeringPolicy>
+		<encoder>
+			<charset>UTF-8</charset>
+			<pattern>${pattern_log2}</pattern>
+			<outputPatternAsHeader>false</outputPatternAsHeader>
+		</encoder>
+	</appender>
+
+
+
+     <appender name="ASYNC_500_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>500</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <appender-ref ref="FILE" />
+      </appender>
+
 	<logger name="pl.java.scalatech" level="info" />
 	<logger name="org.springframework" level="info" />
 	<logger name="org.springframework.data" level="warn" />
 	<logger name="org.springframework.security" level="info" />
 	<logger name="org.springframework.jms" level="info" />
 	
-	<root level="info">
-		<appender-ref ref="console" />
-		<appender-ref ref="FILE" />
-	</root>
+	<logger name="org.hibernate.SQL" additivity="false">
+       <level value="DEBUG" />
+       <appender-ref ref="SQL_FILE" />
+    </logger>
+    <logger name="org.hibernate.type" additivity="false">
+      <level value="TRACE" />
+      <appender-ref ref="SQL_FILE" />
+    </logger>
+	
+    <root>
+     <level value="OFF" />
+     <appender-ref ref="console" />
+     <appender-ref ref="ASYNC_500_FILE"/>
+   </root>
+   
+   <logger name="sql_and_problem" additivity="false">
+      <level value="INFO" />
+      <appender-ref ref="SQL_FILE"/>
+      <appender-ref ref="PROBLEM_FILE" />
+   </logger>
+   
 </configuration>
