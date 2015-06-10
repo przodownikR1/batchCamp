@@ -49,7 +49,7 @@ dependencies {
     compile("com.codahale.metrics:metrics-jvm:${codahale}")
     compile("com.codahale.metrics:metrics-logback:${codahale}")
     compile("com.ryantenney.metrics:metrics-spring:3.0.1")
-    
+    compile 'org.fusesource.jansi:jansi:1.11'
     compile "com.zaxxer:HikariCP:${hikariCPVersion}"
     
     runtime("com.h2database:h2")

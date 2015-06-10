@@ -11,7 +11,6 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -40,17 +39,14 @@ public class SimpleGenericReaderJob {
 
     @Autowired
     private StepBuilderFactory steps;
-    
+
     @Autowired
     private ItemReader<Customer> genericReader;
-    
 
     @Bean
     public CustomDateEditor customDateEditor() {
         return new CustomDateEditor(sdf, false);
     }
-    
-    
 
     @Bean
     public Job importUserJob(Step step1, Step step2) {
@@ -61,8 +57,8 @@ public class SimpleGenericReaderJob {
     public Step step1() {
         return steps.get("step1").<Customer, Customer> chunk(10).reader(genericReader).processor(processor()).writer(writer()).build();
     }
-    
-    @Bean
+
+    @Bean(name = "fieldSetMapper")
     public FieldSetMapper<Customer> customerMapper() {
         FieldSetMapper<Customer> mapper = new FieldSetMapper<Customer>() {
 
@@ -88,16 +84,15 @@ public class SimpleGenericReaderJob {
         };
         return mapper;
     }
-    
+
     @Bean
-    public List<String> columns(){
-      return  Lists.newArrayList();
+    public List<String> columns() {
+        return Lists.newArrayList();
     }
 
     @Bean
     public ItemWriter<Customer> writer() {
-        return items ->
-        {
+        return items -> {
             for (Customer c : items) {
                 log.info("+++ write : {} ", c);
             }
@@ -107,8 +102,7 @@ public class SimpleGenericReaderJob {
 
     @Bean
     public ItemProcessor<Customer, Customer> processor() {
-        return item ->
-        {
+        return item -> {
             log.info("+++  process : {}", item);
             return item;
         };

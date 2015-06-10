@@ -2,6 +2,7 @@ package pl.java.scalatech.adaperWriter;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.configuration.JobRegistry;
@@ -32,6 +33,7 @@ public class AdapterWriterTest {
     private JobLauncher jobLauncher;
 
     @Test
+    @Ignore
     public void shouldBootStrapWork() {
 
     }

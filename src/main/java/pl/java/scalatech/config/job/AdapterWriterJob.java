@@ -16,7 +16,6 @@ import org.springframework.batch.item.adapter.ItemWriterAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import pl.java.scalatech.config.batch.BatchConfig;
@@ -24,7 +23,7 @@ import pl.java.scalatech.config.reader.ReaderConfig;
 import pl.java.scalatech.domain.Customer;
 import pl.java.scalatech.repository.CustomerRepository;
 
-@Configuration
+// @Configuration
 @Import({ BatchConfig.class, ReaderConfig.class })
 @Slf4j
 public class AdapterWriterJob {

@@ -3,11 +3,15 @@
 	<contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
 		<resetJUL>true</resetJUL>
 	</contextListener>
+	 <consolePlugin />
+	
 	<jmxConfigurator />
+	<withJansi>true</withJansi>
 	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder>
-			<pattern>%.-1level|%-40.40logger{0}|%msg%n</pattern>
-		</encoder>
+    <encoder>
+        <pattern>%.-1level|%-40.40logger{0}|%msg%n</pattern>
+        <!-- <pattern>[%thread] %highlight(%-5level) %cyan(%logger{15}) - %msg %n</pattern> -->
+    </encoder>
 	</appender>
 	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
 		<file>batchCamp.log</file>
@@ -17,15 +21,25 @@
 			</pattern>
 		</encoder>
 	</appender>
+	
+	<appender name="FILE_HTML" class="ch.qos.logback.core.FileAppender">
+    <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+      <layout class="ch.qos.logback.classic.html.HTMLLayout">
+        <pattern>%relative%thread%mdc%level%logger%msg</pattern>
+      </layout>
+    </encoder>
+    <file>batch.html</file>
+  </appender>
+	
 	<logger name="pl.java.scalatech" level="info" />
-	<logger name="org.springframework" level="info" />
+	<logger name="org.springframework" level="warn" />
 	<logger name="org.springframework.data" level="warn" />
 	<logger name="org.hibernate" level="info" />
-	<logger name="org.springframework.security" level="info" />
 	<logger name="org.springframework.jms" level="info" />
 	
-	<root level="info">
+	<root level="warn">
 		<appender-ref ref="console" />
 		<appender-ref ref="FILE" />
+		<!-- <appender-ref ref="FILE_HTML"/> -->
 	</root>
 </configuration>
